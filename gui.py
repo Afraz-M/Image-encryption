@@ -13,8 +13,8 @@ class ImageDropGUI(tk.Tk):
         # Calculate the center of the screen
         screen_width = self.winfo_screenwidth()
         screen_height = self.winfo_screenheight()
-        window_width = 1000
-        window_height = 700
+        window_width = 1400
+        window_height = 750
         x = (screen_width - window_width) // 2
         y = (screen_height - window_height) // 2
 
@@ -80,7 +80,7 @@ class ImageDropGUI(tk.Tk):
         width, height = image.size
         new_width = width // 3
         new_height = height // 3
-        resized_image = image.resize((new_width, new_height), Image.ANTIALIAS)
+        resized_image = image.resize((new_width, new_height), Image.LANCZOS)
         photo_image = ImageTk.PhotoImage(resized_image)
 
         self.image_label.config(image=photo_image)
@@ -303,7 +303,7 @@ class ImageDropGUI(tk.Tk):
 
         row_frame = None
         for idx, image_path in enumerate(images):
-            if idx % 3 == 0:
+            if idx % 4 == 0:
                 row_frame = tk.Frame(self.container)
                 row_frame.pack(pady=5)
 
@@ -311,7 +311,7 @@ class ImageDropGUI(tk.Tk):
             width, height = image.size
             new_width = width // 4
             new_height = height // 4
-            resized_image = image.resize((new_width, new_height), Image.ANTIALIAS)
+            resized_image = image.resize((new_width, new_height), Image.LANCZOS)
             photo_image = ImageTk.PhotoImage(resized_image)
             image_label = tk.Label(row_frame, image=photo_image)
             image_label.photo = photo_image

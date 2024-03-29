@@ -9,7 +9,6 @@ class ImageDropGUI(tk.Tk):
         super().__init__()
 
         self.title("Image Drop and Dropdown GUI")
-
         # Calculate the center of the screen
         screen_width = self.winfo_screenwidth()
         screen_height = self.winfo_screenheight()
@@ -23,7 +22,9 @@ class ImageDropGUI(tk.Tk):
         self.container = tk.Frame(self)
         self.container.pack(expand=True, padx=20, pady=20)
 
-        self.image_label = tk.Label(self.container, text="Drop image here", bg="lightgray")
+        title_label = tk.Label(self.container, text="IMAGE ENCRYPTION SYSTEM", font=("Helvetica", 20))
+        title_label.pack(side="top", pady=20)
+        self.image_label = tk.Label(self.container, text="Drop image here", bg="lightgray", padx=150, pady=100)
         self.image_label.pack(pady=5)
 
         dropdown_frame = tk.Frame(self.container)
@@ -53,10 +54,10 @@ class ImageDropGUI(tk.Tk):
         text_entry_frame = tk.Frame(self.container)
         text_entry_frame.pack(pady=5)
 
-        self.text_label = tk.Label(text_entry_frame, text="Enter Text:")
+        self.text_label = tk.Label(text_entry_frame, text="Number of keys(2-8):")
         self.text_label.pack(side="left")
 
-        self.textbox = tk.Text(text_entry_frame, height=1, width=30)
+        self.textbox = tk.Text(text_entry_frame, height=1, width=3)
         self.textbox.pack(side="left", padx=5)
 
         self.submit_button = tk.Button(self.container, text="START ENCRYPTION", command=self.submit_handler)
@@ -103,6 +104,8 @@ class ImageDropGUI(tk.Tk):
 
     def display_images(self):
         self.clear_previous_widgets(self.container)
+        heading_label = tk.Label(self.container, text="Encrypted Images", font=("Helvetica", 16))
+        heading_label.pack(anchor="nw", padx=10, pady=10)
         images = []
         if self.mode == "1. MODULAR ARITHMETIC ENCRYPTION":
             if self.type == "1. BINARY":
@@ -192,7 +195,7 @@ class ImageDropGUI(tk.Tk):
 
                 shares, input_matrix = EncryptColour_MA(input_image, share_size)
                 for ind in range(share_size):
-                    image = Image.fromarray(shares[:,:,ind].astype(np.uint8) * 255)
+                    image = Image.fromarray(shares[:,:,:,ind].astype(np.uint8) * 255)
                     name = "shares/Colour/MA/Share_" + str(ind+1) + ".png"
                     images.append(name)
                     image.save(name)
@@ -289,7 +292,7 @@ class ImageDropGUI(tk.Tk):
 
                 shares, input_matrix = EncryptColour_XOR(input_image, share_size)
                 for ind in range(share_size):
-                    image = Image.fromarray(shares[:,:,ind].astype(np.uint8) * 255)
+                    image = Image.fromarray(shares[:,:,:,ind].astype(np.uint8) * 255)
                     name = "shares/Colour/XOR/Share_" + str(ind+1) + ".png"
                     images.append(name)
                     image.save(name)
@@ -320,6 +323,89 @@ class ImageDropGUI(tk.Tk):
         # Ensure the last row is properly packed
         if row_frame:
             row_frame.pack(fill="both", expand=True, pady=5)
+        
+        decrypt_button = tk.Button(self.container, text="DECRYPT", command=self.decrypt_handler)
+        decrypt_button.pack(pady=5)
+    
+    def decrypt_handler(self):
+        self.clear_previous_widgets(self.container)
+        heading_label2 = tk.Label(self.container, text="Decrypted Images", font=("Helvetica", 16))
+        heading_label2.pack(anchor="nw", padx=10, pady=10)
+        decrypted_image_path  = ""
+        if self.mode == "1. MODULAR ARITHMETIC ENCRYPTION":
+            if self.type == "1. BINARY":
+                decrypted_image_path = "Output/Binary/MA.png"
+            elif self.type == "2. GRAYSCALE":
+                decrypted_image_path = "Output/Grayscale/MA.png"
+            else:
+                decrypted_image_path = "Output/Colour/MA.png"
+        elif self.mode == "2. XOR ENCRYPTION":
+            if self.type == "1. BINARY":
+                decrypted_image_path = "Output/Binary/XOR.png"
+            elif self.type == "2. GRAYSCALE":
+                decrypted_image_path = "Output/Grayscale/XOR.png"
+            else:
+                decrypted_image_path = "Output/Colour/XOR.png"
+
+        decrypted_image = Image.open(decrypted_image_path)
+        width, height = decrypted_image.size
+        new_width = width // 2
+        new_height = height // 2
+        resized_image = decrypted_image.resize((new_width, new_height), Image.LANCZOS)
+        photo_image = ImageTk.PhotoImage(resized_image)
+        image_label = tk.Label(self.container, image=photo_image)
+        image_label.photo = photo_image
+        image_label.pack(pady=5)
+        return_button = tk.Button(self.container, text="RETURN TO HOME", command=self.return_to_home)
+        return_button.pack(pady=5)
+    
+    def return_to_home(self):
+        self.clear_previous_widgets(self.container)
+        title_label = tk.Label(self.container, text="IMAGE ENCRYPTION SYSTEM", font=("Helvetica", 20))
+        title_label.pack(side="top", pady=20)
+        # Recreate the initial GUI elements
+        self.image_label = tk.Label(self.container, text="Drop image here", bg="lightgray", padx=150, pady=100)
+        self.image_label.pack(pady=5)
+
+        dropdown_frame = tk.Frame(self.container)
+        dropdown_frame.pack(pady=5)
+
+        self.dropdown_label = tk.Label(dropdown_frame, text="Encryption Mode:")
+        self.dropdown_label.pack(side="left")
+
+        self.dropdown_var = tk.StringVar(self)
+        self.dropdown_var.set("Select Option")
+
+        self.dropdown_menu = tk.OptionMenu(dropdown_frame, self.dropdown_var, "1. MODULAR ARITHMETIC ENCRYPTION", "2. XOR ENCRYPTION")
+        self.dropdown_menu.pack(side="left", padx=5)
+
+        dropdown_frame2 = tk.Frame(self.container)
+        dropdown_frame2.pack(pady=5)
+
+        self.dropdown_label2 = tk.Label(dropdown_frame2, text="Image Type:")
+        self.dropdown_label2.pack(side="left")
+
+        self.dropdown_var2 = tk.StringVar(self)
+        self.dropdown_var2.set("Select Option")
+
+        self.dropdown_menu2 = tk.OptionMenu(dropdown_frame2, self.dropdown_var2, "1. BINARY", "2. GRAYSCALE", "3. COLOUR")
+        self.dropdown_menu2.pack(side="left", padx=5)
+
+        text_entry_frame = tk.Frame(self.container)
+        text_entry_frame.pack(pady=5)
+
+        self.text_label = tk.Label(text_entry_frame, text="Number of keys(2-8):")
+        self.text_label.pack(side="left")
+
+        self.textbox = tk.Text(text_entry_frame, height=1, width=3)
+        self.textbox.pack(side="left", padx=5)
+
+        self.submit_button = tk.Button(self.container, text="START ENCRYPTION", command=self.submit_handler)
+        self.submit_button.pack(pady=5)
+
+        # Bind the drop_handler to the label
+        self.image_label.bind("<Button-1>", self.drop_handler)
+
 
 if __name__ == "__main__":
     app = ImageDropGUI()

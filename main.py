@@ -1,6 +1,5 @@
 from modules.ModularArithmetic import *
 from modules.XOR import *
-from modules.AES import *
 import string
 import random
 
